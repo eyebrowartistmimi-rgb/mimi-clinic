@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>提携クリニック一覧 | MIMI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #faf9f7; --surface: #ffffff; --border: #e8e4de; --border-hover: #c8c2b8;
+    --text: #1a1815; --text-muted: #7a746c; --text-light: #b0a89e;
+    --accent: #1a1815; --accent-inv: #ffffff; --tag-bg: #f2ede8; --map-color: #8a6f5a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #131210; --surface: #1e1c1a; --border: #2e2b28; --border-hover: #4a4640;
+      --text: #f0ece7; --text-muted: #8a8078; --text-light: #5a5248;
+      --accent: #f0ece7; --accent-inv: #131210; --tag-bg: #2a2724; --map-color: #c8a888;
+    }
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 400; min-height: 100vh; line-height: 1.7; }
+  header { text-align: center; padding: 4rem 1.5rem 3rem; border-bottom: 0.5px solid var(--border); }
+  .header-label { font-family: 'Noto Serif JP', serif; font-weight: 300; font-size: 10px; letter-spacing: 0.35em; color: var(--text-light); text-transform: uppercase; margin-bottom: 1rem; }
+  .header-title { font-family: 'Noto Serif JP', serif; font-weight: 300; font-size: 26px; letter-spacing: 0.15em; color: var(--text); margin-bottom: 0.5rem; }
+  .header-subtitle { font-size: 12px; letter-spacing: 0.08em; color: var(--text-muted); }
+  .header-line { width: 32px; height: 0.5px; background: var(--text-light); margin: 1.25rem auto 0; }
+  .container { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+  .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 3rem; }
+  .filter-btn { font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 12px; font-weight: 400; letter-spacing: 0.08em; padding: 6px 18px; border: 0.5px solid var(--border); border-radius: 50px; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; }
+  .filter-btn:hover { border-color: var(--border-hover); color: var(--text); }
+  .filter-btn.active { background: var(--accent); color: var(--accent-inv); border-color: var(--accent); }
+  .pref-section { margin-bottom: 2.5rem; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .pref-heading { font-family: 'Noto Serif JP', serif; font-weight: 300; font-size: 12px; letter-spacing: 0.25em; color: var(--text-muted); padding-bottom: 10px; border-bottom: 0.5px solid var(--border); margin-bottom: 1.25rem; }
+  .clinic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .clinic-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.25rem 1.25rem 1rem; transition: border-color 0.2s ease; display: flex; flex-direction: column; gap: 0; }
+  .clinic-card:hover { border-color: var(--border-hover); }
+  .clinic-name { font-weight: 500; font-size: 14px; color: var(--text); line-height: 1.5; margin-bottom: 0.75rem; }
+  .clinic-addr-block { display: flex; align-items: flex-start; gap: 8px; padding: 0.75rem 0; border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); }
+  .clinic-addr-block i { font-size: 14px; color: var(--text-light); flex-shrink: 0; margin-top: 2px; }
+  .clinic-addr-text { font-size: 12.5px; color: var(--text-muted); line-height: 1.7; }
+  .btn-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 0.875rem; }
+  .map-link, .clinic-link { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; letter-spacing: 0.05em; color: var(--map-color); text-decoration: none; border: 0.5px solid var(--border); border-radius: 50px; padding: 5px 13px; transition: border-color 0.2s ease; }
+  .map-link:hover, .clinic-link:hover { border-color: var(--border-hover); }
+  .map-link i, .clinic-link i { font-size: 12px; }
+  .pref-tag { display: inline-block; font-size: 10px; letter-spacing: 0.08em; padding: 2px 10px; border-radius: 50px; background: var(--tag-bg); color: var(--text-muted); margin-top: 0.625rem; align-self: flex-start; }
+  .empty { text-align: center; padding: 4rem 0; color: var(--text-muted); font-size: 13px; letter-spacing: 0.05em; }
+  footer { text-align: center; padding: 2rem; border-top: 0.5px solid var(--border); font-size: 11px; letter-spacing: 0.1em; color: var(--text-light); font-family: 'Noto Serif JP', serif; font-weight: 300; }
+  @media (max-width: 480px) { header { padding: 3rem 1rem 2rem; } .header-title { font-size: 20px; } .container { padding: 2rem 1rem 4rem; } .clinic-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="header-label">Partner Clinic</p>
+  <h1 class="header-title">提携クリニック一覧</h1>
+  <p class="header-subtitle">全国の提携クリニックをご紹介します</p>
+  <div class="header-line"></div>
+</header>
+
+<main class="container">
+  <nav class="filter-bar" id="filters" aria-label="エリアフィルター"></nav>
+  <div id="list" role="region" aria-live="polite"></div>
+</main>
+
+<footer>
+  &copy; MIMI. All rights reserved.
+</footer>
+
+<script>
+  const clinics = [
+    {
+      pref: "北海道",
+      name: "リアンクリニック",
+      addr: "札幌市豊平区美園５条２丁目２−１８",
+      map: "https://maps.google.com/?q=北海道札幌市豊平区美園５条２丁目２−１８",
+      url: null
+    },
+    {
+      pref: "千葉",
+      name: "ともこ皮フクリニック",
+      addr: "佐倉市染井野５丁目３０−１",
+      map: "https://maps.google.com/?q=千葉県佐倉市染井野５丁目３０−１",
+      url: null
+    },
+    {
+      pref: "東京",
+      name: "A.R.Tクリニック新宿南口",
+      addr: "新宿区西新宿１丁目１８−５ ７階",
+      map: "https://maps.google.com/?q=東京都新宿区西新宿１丁目１８−５",
+      url: null
+    },
+    {
+      pref: "横浜",
+      name: "ティファクリニック横浜院",
+      addr: "横浜市西区北幸１丁目１−８\nエキニア横浜 7F 705-2",
+      map: "https://maps.google.com/?q=神奈川県横浜市西区北幸1丁目1-8",
+      url: "https://yokohama.tifaclinic.jp/"
+    },
+    {
+      pref: "大阪",
+      name: "春次医院",
+      addr: "大阪市中央区博労町２丁目６−１\n春次ビル",
+      map: "https://maps.google.com/?q=大阪府大阪市中央区博労町２丁目６−１",
+      url: null
+    },
+  ];
+
+  const prefOrder = ["北海道", "千葉", "東京", "横浜", "名古屋", "大阪", "福岡"];
+  const prefs = ["すべて", ...prefOrder.filter(p => clinics.some(c => c.pref === p))];
+  let active = "すべて";
+
+  const filtersEl = document.getElementById("filters");
+  const listEl = document.getElementById("list");
+
+  function renderFilters() {
+    filtersEl.innerHTML = prefs.map(p =>
+      `<button class="filter-btn${p === active ? " active" : ""}" data-p="${p}">${p}</button>`
+    ).join("");
+    filtersEl.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        active = btn.dataset.p;
+        renderFilters();
+        renderList();
+      });
+    });
+  }
+
+  function renderList() {
+    const filtered = active === "すべて" ? clinics : clinics.filter(c => c.pref === active);
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="empty">該当するクリニックがありません</div>';
+      return;
+    }
+    const byPref = {};
+    filtered.forEach(c => {
+      if (!byPref[c.pref]) byPref[c.pref] = [];
+      byPref[c.pref].push(c);
+    });
+    const orderedPrefs = prefOrder.filter(p => byPref[p]);
+    listEl.innerHTML = orderedPrefs.map(pref => `
+      <section class="pref-section">
+        <h2 class="pref-heading">${pref}</h2>
+        <div class="clinic-grid">
+          ${byPref[pref].map(c => `
+            <div class="clinic-card">
+              <p class="clinic-name">${c.name}</p>
+              <div class="clinic-addr-block">
+                <i class="ti ti-map-pin" aria-hidden="true"></i>
+                <span class="clinic-addr-text">${c.addr.replace(/\n/g, '<br>')}</span>
+              </div>
+              <div class="btn-row">
+                <a class="map-link" href="${c.map}" target="_blank" rel="noopener">
+                  <i class="ti ti-map-2" aria-hidden="true"></i>Google マップ
+                </a>
+                ${c.url ? `<a class="clinic-link" href="${c.url}" target="_blank" rel="noopener">
+                  <i class="ti ti-external-link" aria-hidden="true"></i>公式サイト
+                </a>` : ""}
+              </div>
+              <span class="pref-tag">${c.pref}</span>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `).join("");
+  }
+
+  renderFilters();
+  renderList();
+</script>
+
+</body>
+</html>
